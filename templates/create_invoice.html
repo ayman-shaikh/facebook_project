@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+{% block content %}
+{% load static %}
+<section class="" style="background-color: #9A616D;">
+  <div class="container py-5 h-100">
+    <div class="row d-flex justify-content-center align-items-center h-100">
+      <div class="col-12 col-md-8 col-lg-6 col-xl-5" style="width: 75%;">
+        <div class="card shadow-2-strong" style="border-radius: 1rem;">
+          <div class="card-body p-5 text-center">
+            <form action="{% url 'create_invoice'%}" method="post"> {% csrf_token %}
+              <h3 class="mb-5">Invoice Creation</h3>
+                
+              <div data-mdb-input-init class="form-outline mb-4">
+                <label class="form-label" for="invoiceNo">Invoice Number</label>
+                <input type="text" id="invoiceNo" name="invoiceNo" class="form-control form-control-lg" readonly required />
+              </div>
+  
+              <div data-mdb-input-init class="form-outline mb-4">
+                <label class="form-label" for="invoiceDate">Invoice Date</label>
+                <input type="date" id="invoiceDate" name="invoiceDate" class="form-control form-control-lg" required />
+              </div>
+
+              <div data-mdb-input-init class="form-outline mb-4">
+                <label class="form-label" for="name">Name on Billing Address</label>
+                <input type="text" id="name" name="name" class="form-control form-control-lg" required />
+              </div>
+
+              <div data-mdb-input-init class="form-outline mb-4">
+                <label class="form-label" for="date">Billing Address</label>
+                <textarea id="address" name="address" class="form-control form-control-lg" required ></textarea>
+              </div>
+
+              <table id="invoiceTable" class="table table-bordered">
+                <thead>
+                  <th>S.No.</th>
+                  <th>Item Description</th>
+                  <th>Qty</th>
+                  <th>Rate</th>
+                  <th>Amount</th>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <div data-mdb-input-init class="form-outline">
+                          <input type="number" class="form-control form-control-lg" name="sNo1" id="sNo1" readonly value="1" required />
+                      </div>
+                    </td>
+                    <td>
+                      <div data-mdb-input-init class="form-outline">
+                          <input type="text" class="form-control form-control-lg" name="description1" id="description1" required />
+                      </div>
+                    </td>
+                    <td>
+                      <div data-mdb-input-init class="form-outline">
+                          <input type="number" class="form-control form-control-lg" name="qty1" id="qty1" value="0" required />
+                      </div>
+                    </td>
+                    <td>
+                      <div data-mdb-input-init class="form-outline">
+                          <input type="number" class="form-control form-control-lg" name="rate1" id="rate1" value="0" step="0.01" required />
+                      </div>
+                    </td>
+                    <td>
+                      <div data-mdb-input-init class="form-outline">
+                          <input type="number" class="form-control form-control-lg" name="amount1" id="amount1" readonly value="0" required />
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td colspan="4">
+                      <div data-mdb-input-init class="form-outline">
+                        <span class="form-control form-control-lg" >Total</span>
+                      </div>
+                    </td>
+                    <td>
+                      <div data-mdb-input-init class="form-outline">
+                        <input class="form-control form-control-lg" name="total" id="total" readonly value="0" required />
+                      </div>
+                    </td>
+                </tr>
+                </tfoot>
+              </table>
+              <input type="text" hidden name="count" id="count" value="1">
+              <button data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-dark btn-lg btn-block" onclick="addItem()" type="button">Add Item</button>
+              <button data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-dark btn-lg btn-block" onclick="deleteLastItem()" type="button">Delete Last Item</button>
+              <button data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-dark btn-lg btn-block" onclick="getTotal()" type="button">Calculate Total</button><br>
+              <button data-mdb-button-init data-mdb-ripple-init class="btn btn-dark btn-lg btn-block mt-2" onclick="getTotal()" type="submit">Generate</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<script>
+  function randomize(min, max) {
+      return Math.floor(Math.random() * (max-min+1) + min);
+  }
+
+  document.getElementById("invoiceNo").value = "INV"+randomize(1000, 9999);
+  
+  function addItem() {
+      var table = document.getElementById("invoiceTable");
+      var tableBody = table.getElementsByTagName("tbody")[0];
+      var rowCount = tableBody.rows.length;
+      //console.log(rowCount);
+      var lastRow = tableBody.rows[rowCount-1];
+      var lastProdDesc = document.getElementById("description"+rowCount).value;
+      //console.log(lastProdDesc);
+      if (!/\S/.test(lastProdDesc)) {
+          // string is empty or just whitespace
+          alert("Complete previous item entry.");
+          return;
+      }
+      rowCount++;
+      document.getElementById("count").value = rowCount;
+      var row = tableBody.insertRow();
+      var cell1 = row.insertCell(0);
+      var cell2 = row.insertCell(1);
+      var cell3 = row.insertCell(2);
+      var cell4 = row.insertCell(3);
+      var cell5 = row.insertCell(4);
+      cell1.innerHTML = "<div data-mdb-input-init class='form-outline'>\
+                          <input type='number' class='form-control form-control-lg' name='sNo"+rowCount+"' id='sNo"+rowCount+"' readonly value='"+rowCount+"' required />\
+                        </div>"
+      cell2.innerHTML = "<div data-mdb-input-init class='form-outline'>\
+                          <input type='text' class='form-control form-control-lg' name='description"+rowCount+"' id='description"+rowCount+"' required />\
+                        </div>"
+      cell3.innerHTML = "<div data-mdb-input-init class='form-outline'>\
+                          <input type='number' class='form-control form-control-lg' name='qty"+rowCount+"' id='qty"+rowCount+"' value='0' required />\
+                        </div>"
+      cell4.innerHTML = "<div data-mdb-input-init class='form-outline'>\
+                          <input type='number' class='form-control form-control-lg' name='rate"+rowCount+"' id='rate"+rowCount+"' value='0' step='0.01' required />\
+                        </div>"
+      cell5.innerHTML = "<div data-mdb-input-init class='form-outline'>\
+                          <input type='number' class='form-control form-control-lg' name='amount"+rowCount+"' id='amount"+rowCount+"' readonly value='0' required />\
+                        </div>"
+  }
+
+  function deleteLastItem() {
+      var table = document.getElementById("invoiceTable");
+      var tableBody = table.getElementsByTagName("tbody")[0];
+      var rowCount = tableBody.rows.length;
+      if(rowCount==1) {
+          alert("Atleast one item required in the invoice.");
+          return;
+      }
+      rowCount--;
+      document.getElementById("count").value = rowCount;
+      tableBody.deleteRow(-1);
+  }
+
+  function getTotal() {
+      var table = document.getElementById("invoiceTable");
+      var tableBody = table.getElementsByTagName("tbody")[0];
+      var rows = tableBody.rows;
+      var rowCount = rows.length;
+      var total = 0;
+      for(var i=0; i<rowCount; i++) {
+        //console.log(i);
+        var qty = parseFloat(document.getElementById("qty"+(i+1)).value);
+        var rate = parseFloat(document.getElementById("rate"+(i+1)).value);
+        var amount = qty*rate;
+        document.getElementById("amount"+(i+1)).value = amount;
+        total += amount;
+      }
+      document.getElementById("total").value=total;
+  }
+</script>
+{% endblock content %}

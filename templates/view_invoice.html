@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="w-100 vh-100" style="background-color: #9A616D;">
+    <div class="container py-5 h-100">
+      <div class="row d-flex justify-content-center align-items-center h-100">
+        <div class="col-12 col-md-8 col-lg-6 col-xl-5" style="width: 90%;">
+          <div class="card shadow-2-strong" style="border-radius: 1rem;">
+            <div class="card-body p-5 text-center">
+                <h3 class="mb-5">View Invoices</h3>
+                <table id="invoiceTable" class="table table-bordered">
+                  <thead>
+                    <th>S.No.</th>
+                    <th>Invoice Number</th>
+                    <th>Date</th>
+                    <th>Name</th>
+                    <th>Address</th>
+                    <th>Item Description</th>
+                    <th>Qty</th>
+                    <th>Rate</th>
+                    <th>Amount</th>
+                    <th>Delete</th>
+                  </thead>
+                  <tbody>
+                    {% for i in invoice1%}
+                    <tr>
+                        <th scope="row">{{forloop.counter}}</th>
+                        <td>{{i.invoice_no}}</td>
+                        <td>{{i.invoice_date}}</td>
+                        <td>{{i.name}}</td>
+                        <td>{{i.address}}</td>
+                        <td>{{i.product_description}}</td>
+                        <td>{{i.quantity}}</td>
+                        <td>{{i.rate}}</td>
+                        <td>{{i.amount}}</td>
+                        <td><a class="btn btn-danger" href="{% url 'delete_invoice' i.id %}">Delete</a></td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+{% endblock content%}
